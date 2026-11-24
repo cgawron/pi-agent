@@ -5,7 +5,8 @@ metadata:
   namespace: pi-agent
   annotations:
     traefik.frontend.passHostHeader: 'true'
-    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt  
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    traefik.ingress.kubernetes.io/router.middlewares: pi-agent-pi-agent-initial-workspace@kubernetescrd
 spec:
   ingressClassName: traefik
   rules:

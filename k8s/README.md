@@ -109,3 +109,10 @@ the Secret. Do not store credentials in Git or in the container image.
 The workspace PVC starts empty. Populate it with the project files the agent
 should access, and ensure the storage driver allows the container's UID/GID
 `1000` to write to the mounted volumes.
+
+PI WEB's project registry and server-side data are stored in the `pi-agent-data`
+PVC at `/home/node/.pi/web-data`. On first startup, an init container seeds the
+registry with the `/workspace` project from `base/initial-workspace.yaml`; it
+does not replace the registry after that file exists. Traefik redirects visits
+to the bare site root to the `/workspace` project and workspace, so a fresh
+browser opens there. Other PI WEB URLs and navigation remain available.

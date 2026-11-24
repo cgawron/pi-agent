@@ -22,6 +22,25 @@ spec:
         fsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
+      initContainers:
+        - name: pi-web-bootstrap
+          image: ghcr.io/cgawron/pi-agent:main
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              mkdir -p /home/node/.pi/web-data
+              if [ ! -e /home/node/.pi/web-data/projects.json ]; then
+                cp /etc/pi-web-bootstrap/projects.json /home/node/.pi/web-data/projects.json.tmp
+                mv /home/node/.pi/web-data/projects.json.tmp /home/node/.pi/web-data/projects.json
+              fi
+          volumeMounts:
+            - name: pi-agent-data
+              mountPath: /home/node/.pi
+            - name: pi-web-bootstrap
+              mountPath: /etc/pi-web-bootstrap
+              readOnly: true
       containers:
         - name: pi-agent
           image: ghcr.io/cgawron/pi-agent:main
@@ -35,6 +54,8 @@ spec:
               value: 0.0.0.0
             - name: PI_WEB_PORT
               value: "8504"
+            - name: PI_WEB_DATA_DIR
+              value: /home/node/.pi/web-data
             - name: PI_WEB_HOST_ACCESS
               value: '{"mode":"restricted","hosts":["agent.gawron.cloud"]}'
             - name: OPENAI_API_KEY
@@ -97,3 +118,6 @@ spec:
         - name: pi-agent-workspace
           persistentVolumeClaim:
             claimName: pi-agent-workspace
+        - name: pi-web-bootstrap
+          configMap:
+            name: pi-agent-pi-web-bootstrap

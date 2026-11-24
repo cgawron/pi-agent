@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pi-agent-pi-web-bootstrap
+  namespace: pi-agent
+data:
+  projects.json: |
+    {
+      "projects": [
+        {
+          "id": "b8ee990c-7449-4dfa-95fb-34c6c5a31866",
+          "name": "workspace",
+          "path": "/workspace",
+          "createdAt": "2026-11-24T22:30:30.471Z"
+        }
+      ]
+    }
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: pi-agent-initial-workspace
+  namespace: pi-agent
+spec:
+  redirectRegex:
+    regex: ^https?://agent\.gawron\.cloud/$
+    replacement: https://agent.gawron.cloud/?project=b8ee990c-7449-4dfa-95fb-34c6c5a31866&workspace=cef0da9a332a
+    permanent: false
