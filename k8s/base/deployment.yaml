@@ -35,12 +35,20 @@ spec:
                 cp /etc/pi-web-bootstrap/projects.json /home/node/.pi/web-data/projects.json.tmp
                 mv /home/node/.pi/web-data/projects.json.tmp /home/node/.pi/web-data/projects.json
               fi
+              mkdir -p /vault/agent
+              if [ ! -e /workspace/AGENTS.md ]; then
+                : > /workspace/AGENTS.md
+              fi
           volumeMounts:
             - name: pi-agent-data
               mountPath: /home/node/.pi
             - name: pi-web-bootstrap
               mountPath: /etc/pi-web-bootstrap
               readOnly: true
+            - name: pi-agent-workspace
+              mountPath: /workspace
+            - name: pi-agent-obsidian-vault
+              mountPath: /vault
       containers:
         - name: pi-agent
           image: ghcr.io/cgawron/pi-agent:main
@@ -105,6 +113,16 @@ spec:
               readOnly: true
             - name: pi-agent-workspace
               mountPath: /workspace
+            - name: pi-agent-obsidian-vault
+              mountPath: /workspace/vault
+              readOnly: true
+            - name: pi-agent-obsidian-vault
+              mountPath: /workspace/vault/agent
+              subPath: agent
+            - name: pi-web-bootstrap
+              mountPath: /workspace/AGENTS.md
+              subPath: AGENTS.md
+              readOnly: true
       volumes:
         - name: pi-agent-data
           persistentVolumeClaim:
@@ -118,6 +136,9 @@ spec:
         - name: pi-agent-workspace
           persistentVolumeClaim:
             claimName: pi-agent-workspace
+        - name: pi-agent-obsidian-vault
+          persistentVolumeClaim:
+            claimName: pi-agent-obsidian-vault
         - name: pi-web-bootstrap
           configMap:
             name: pi-agent-pi-web-bootstrap

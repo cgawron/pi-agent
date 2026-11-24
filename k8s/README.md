@@ -116,3 +116,11 @@ registry with the `/workspace` project from `base/initial-workspace.yaml`; it
 does not replace the registry after that file exists. Traefik redirects visits
 to the bare site root to the `/workspace` project and workspace, so a fresh
 browser opens there. Other PI WEB URLs and navigation remain available.
+
+The Obsidian vault is shared from the existing NFS export at
+`172.17.38.30:/mnt/volume1/syncthing/FH-SWF/CGawron` and appears at
+`/workspace/vault`. PI WEB mounts the vault read-only, then mounts its `agent`
+subfolder read-write. The init container creates that folder if needed.
+`/workspace/AGENTS.md` is mounted read-only with the same policy for the agent:
+it can read the vault and should put generated files only in
+`/workspace/vault/agent/`.

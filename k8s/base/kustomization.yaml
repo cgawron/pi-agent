@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - persistent-volume-claims.yaml
+  - obsidian-vault-storage.yaml
   - initial-workspace.yaml
   - model-config.yaml
   - mcp-config.yaml

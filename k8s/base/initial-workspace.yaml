@@ -15,6 +15,16 @@ data:
         }
       ]
     }
+  AGENTS.md: |
+    # Obsidian vault policy
+
+    The Obsidian vault is mounted at `/workspace/vault`. You may read all of its
+    contents. Do not create, edit, rename, delete, move, or overwrite anything
+    outside `/workspace/vault/agent/`.
+
+    Put all notes, summaries, reports, and other files you create in the vault
+    under `/workspace/vault/agent/`. The `agent` folder is writable; the rest of
+    the vault is mounted read-only.
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
