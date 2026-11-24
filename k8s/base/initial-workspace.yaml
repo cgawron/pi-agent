@@ -24,5 +24,5 @@ metadata:
 spec:
   redirectRegex:
     regex: ^https?://agent\.gawron\.cloud/$
-    replacement: https://agent.gawron.cloud/?project=b8ee990c-7449-4dfa-95fb-34c6c5a31866&workspace=cef0da9a332a
+    replacement: https://agent.gawron.cloud/?project=b8ee990c-7449-4dfa-95fb-34c6c5a31866&workspace=bd69727e2c1a
     permanent: false
