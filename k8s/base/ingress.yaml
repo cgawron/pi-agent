@@ -16,6 +16,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: pi-agent
+                name: pi-agent-oauth2-proxy
                 port:
-                  number: 8504
+                  number: 4180

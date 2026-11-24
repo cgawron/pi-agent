@@ -4,8 +4,12 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - persistent-volume-claims.yaml
+  - oauth2-proxy-config.yaml
+  - oauth2-proxy-allowlist.yaml
   - deployment.yaml
   - service.yaml
+  - oauth2-proxy-deployment.yaml
+  - oauth2-proxy-service.yaml
   - ingress.yaml
 
 images:

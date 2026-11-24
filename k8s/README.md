@@ -1,8 +1,9 @@
 # Deploy with Argo CD
 
-The manifests deploy `pi-web` as a single replica, expose it on
-`agent.gawron.cloud` through Traefik and inside the cluster on port `8504`, and
-persist Pi's agent data and `/workspace` on separate PVCs.
+The manifests deploy `pi-web` as a single replica behind `oauth2-proxy`, expose
+it on `agent.gawron.cloud` through Traefik, and persist Pi's agent data and
+`/workspace` on separate PVCs. The app's ClusterIP service on port `8504` is
+only used internally by the auth proxy.
 The PVCs use the cluster's default StorageClass and request 5 GiB and 20 GiB.
 Change these values in `base/persistent-volume-claims.yaml` to match your cluster.
 
@@ -45,8 +46,36 @@ kubectl apply -f k8s/argocd/application.yaml
 
 The Application targets the `main` branch and enables automated sync, pruning,
 and self-healing. Point `agent.gawron.cloud` DNS at the Traefik ingress address.
-The Ingress does not declare TLS; configure HTTPS through your Traefik TLS
-resolver or provide a TLS secret in `base/ingress.yaml` for your cluster.
+The Ingress uses the Traefik `letsencrypt` certificate resolver configured in
+`base/ingress.yaml`.
+
+## Configure OpenID Connect login
+
+`oauth2-proxy` is the OIDC client and reverse proxy in front of `pi-web`. It
+uses Keycloak at `https://keycloak.gawron.cloud/realms/private`. Register
+`https://agent.gawron.cloud/oauth2/callback` as an allowed redirect URI for the
+OIDC client. Access is restricted to exact email addresses listed in
+`base/oauth2-proxy-allowlist.yaml`, one address per line. The list is empty by
+default, so no user is allowed until you add an address. Keycloak must return
+the user's email claim. For example:
+
+```yaml
+data:
+  allowed-users.txt: |
+    alice@example.com
+    bob@example.net
+```
+
+Restart the `pi-agent-oauth2-proxy` Deployment after changing the allowlist so
+the proxy reloads it.
+
+Create a Kubernetes Secret named `pi-agent-oauth2-proxy-credentials` in the
+`pi-agent` namespace through your secrets manager. It must contain keys named
+`OAUTH2_PROXY_CLIENT_ID`, `OAUTH2_PROXY_CLIENT_SECRET`, and
+`OAUTH2_PROXY_COOKIE_SECRET`. Generate the cookie secret with
+`openssl rand -base64 32`. The Deployment intentionally requires this Secret,
+so the Ingress will not forward traffic to the app until OIDC credentials are
+configured. Keep these credentials out of Git.
 
 ## Configure credentials
 

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pi-agent-oauth2-proxy-allowlist
+  namespace: pi-agent
+data:
+  allowed-users.txt: "gawron.christian@fh-swf.de"
