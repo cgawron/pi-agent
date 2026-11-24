@@ -67,15 +67,19 @@ data:
 ```
 
 Restart the `pi-agent-oauth2-proxy` Deployment after changing the allowlist so
-the proxy reloads it.
+the proxy reloads it:
 
-Create a Kubernetes Secret named `pi-agent-oauth2-proxy-credentials` in the
-`pi-agent` namespace through your secrets manager. It must contain keys named
-`OAUTH2_PROXY_CLIENT_ID`, `OAUTH2_PROXY_CLIENT_SECRET`, and
-`OAUTH2_PROXY_COOKIE_SECRET`. Generate the cookie secret with
-`openssl rand -base64 32`. The Deployment intentionally requires this Secret,
-so the Ingress will not forward traffic to the app until OIDC credentials are
-configured. Keep these credentials out of Git.
+```sh
+kubectl rollout restart deployment/pi-agent-oauth2-proxy -n pi-agent
+```
+
+`base/oauth2-proxy-sealed-secret.yaml` creates the Kubernetes Secret
+`pi-agent-oauth2-proxy-credentials`. It contains the existing Keycloak
+`pi-agent` client's ID and secret plus a generated cookie secret. The cookie
+secret must be 16, 24, or 32 characters; generate a 32-character value with
+`openssl rand -base64 24`. The SealedSecret is encrypted for this cluster's
+Sealed Secrets controller. The Deployment requires the resulting Secret, so
+the Ingress will not forward traffic to the app until it is unsealed.
 
 ## Configure credentials
 

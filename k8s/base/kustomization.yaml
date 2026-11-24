@@ -6,6 +6,7 @@ resources:
   - persistent-volume-claims.yaml
   - oauth2-proxy-config.yaml
   - oauth2-proxy-allowlist.yaml
+  - oauth2-proxy-sealed-secret.yaml
   - deployment.yaml
   - service.yaml
   - oauth2-proxy-deployment.yaml
