@@ -49,6 +49,12 @@ and self-healing. Point `agent.gawron.cloud` DNS at the Traefik ingress address.
 The Ingress uses the Traefik `letsencrypt` certificate resolver configured in
 `base/ingress.yaml`.
 
+The Deployment enforces PI WEB's hostname policy as restricted to
+`agent.gawron.cloud` through `PI_WEB_HOST_ACCESS`. The oauth2-proxy forwards the
+public Host header unchanged. This policy is environment-managed, so the
+hostname control in Settings → General is read-only; localhost and IP address
+access remain available for local administration.
+
 ## Configure OpenID Connect login
 
 `oauth2-proxy` is the OIDC client and reverse proxy in front of `pi-web`. It

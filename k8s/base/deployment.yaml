@@ -35,6 +35,8 @@ spec:
               value: 0.0.0.0
             - name: PI_WEB_PORT
               value: "8504"
+            - name: PI_WEB_HOST_ACCESS
+              value: '{"mode":"restricted","hosts":["agent.gawron.cloud"]}'
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
