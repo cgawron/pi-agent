@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: pi-agent
-          image: ghcr.io/OWNER/pi-agent:main
+          image: ghcr.io/cgawron/pi-agent:main
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
