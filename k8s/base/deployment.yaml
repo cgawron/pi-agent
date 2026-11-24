@@ -30,6 +30,9 @@ spec:
           args:
             - |
               set -eu
+              # The /home/node/.pi PVC covers the profile created in the image.
+              # Register the image-bundled package in the persistent profile.
+              pi install "$(npm root -g)/@jmfederico/pi-web/dist/pi-packages/scheduled-tasks"
               mkdir -p /home/node/.pi/web-data
               if [ ! -e /home/node/.pi/web-data/projects.json ]; then
                 cp /etc/pi-web-bootstrap/projects.json /home/node/.pi/web-data/projects.json.tmp
@@ -64,6 +67,8 @@ spec:
               value: "8504"
             - name: PI_WEB_DATA_DIR
               value: /home/node/.pi/web-data
+            - name: PI_WEB_CONFIG
+              value: /home/node/.pi/pi-web-config.json
             - name: PI_WEB_HOST_ACCESS
               value: '{"mode":"restricted","hosts":["agent.gawron.cloud"]}'
             - name: OPENAI_API_KEY

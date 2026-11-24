@@ -23,7 +23,8 @@ USER node
 WORKDIR /workspace
 
 # Konfigurations- und Arbeitsverzeichnisse mit korrekten Rechten vorbereiten
-RUN mkdir -p /home/node/.pi/agent /home/node/.pi-web
+RUN mkdir -p /home/node/.pi/agent /home/node/.pi-web \
+    && pi install "$(npm root -g)/@jmfederico/pi-web/dist/pi-packages/scheduled-tasks"
 
 # Standard-Port von pi-web
 EXPOSE 8504

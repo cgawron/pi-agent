@@ -117,6 +117,14 @@ does not replace the registry after that file exists. Traefik redirects visits
 to the bare site root to the `/workspace` project and workspace, so a fresh
 browser opens there. Other PI WEB URLs and navigation remain available.
 
+The image installs PI WEB's bundled **Scheduled agent tasks (beta)** Pi package
+from `@jmfederico/pi-web/dist/pi-packages/scheduled-tasks`. Because the
+`pi-agent-data` PVC covers `/home/node/.pi`, the bootstrap init container also
+registers that image-bundled package in the persistent Pi profile on startup.
+Enable its `scheduled-tasks` plugin in **Settings → PI WEB plugins**. The
+deployment stores PI WEB's writable global configuration at
+`/home/node/.pi/pi-web-config.json` so plugin settings survive pod replacement.
+
 The Obsidian vault is shared from the existing NFS export at
 `172.17.38.30:/mnt/volume1/syncthing/FH-SWF/CGawron` and appears at
 `/workspace/vault`. PI WEB mounts the vault read-only, then mounts its `agent`
