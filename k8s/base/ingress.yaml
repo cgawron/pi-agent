@@ -3,6 +3,9 @@ kind: Ingress
 metadata:
   name: pi-agent
   namespace: pi-agent
+  annotations:
+    traefik.frontend.passHostHeader: 'true'
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt  
 spec:
   ingressClassName: traefik
   rules:
