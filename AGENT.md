@@ -8,3 +8,7 @@ We use the following types of commit messages:
 - `style`: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc).
 - `refactor`: A code change that neither fixes a bug nor adds a feature.
 - `perf`: A code change that improves performance.
+
+## Ingress
+
+We are using `traefik` as our kubernetes ingress.

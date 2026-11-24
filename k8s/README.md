@@ -1,7 +1,8 @@
 # Deploy with Argo CD
 
-The manifests deploy `pi-web` as a single replica, expose it inside the cluster
-on port `8504`, and persist Pi's agent data and `/workspace` on separate PVCs.
+The manifests deploy `pi-web` as a single replica, expose it on
+`agent.gawron.cloud` through Traefik and inside the cluster on port `8504`, and
+persist Pi's agent data and `/workspace` on separate PVCs.
 The PVCs use the cluster's default StorageClass and request 5 GiB and 20 GiB.
 Change these values in `base/persistent-volume-claims.yaml` to match your cluster.
 
@@ -43,9 +44,9 @@ kubectl apply -f k8s/argocd/application.yaml
 ```
 
 The Application targets the `main` branch and enables automated sync, pruning,
-and self-healing. The service is `ClusterIP`; expose it through your existing
-Ingress or Gateway configuration if it needs to be reachable outside the
-cluster.
+and self-healing. Point `agent.gawron.cloud` DNS at the Traefik ingress address.
+The Ingress does not declare TLS; configure HTTPS through your Traefik TLS
+resolver or provide a TLS secret in `base/ingress.yaml` for your cluster.
 
 ## Configure credentials
 

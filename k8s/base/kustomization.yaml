@@ -6,6 +6,7 @@ resources:
   - persistent-volume-claims.yaml
   - deployment.yaml
   - service.yaml
+  - ingress.yaml
 
 images:
   - name: ghcr.io/OWNER/pi-agent
