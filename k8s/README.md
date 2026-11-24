@@ -97,6 +97,11 @@ update the SealedSecret when rotating it. Restart the `pi-agent` Deployment
 after changing `models.json` or rotating the key so the mounted config and
 environment variable are reloaded.
 
+`base/mcp-config.yaml` configures Composio Connect at
+`https://connect.composio.dev/mcp`. Pi sends the SealedSecret-backed
+`COMPOSIO_API_KEY` as `x-consumer-api-key`. Composio may ask you to authorize
+individual apps the first time their tools are used.
+
 Pi configuration can be stored in the persistent `/home/node/.pi` volume.
 Configure model providers there, or use provider environment variables from
 the Secret. Do not store credentials in Git or in the container image.

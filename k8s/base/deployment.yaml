@@ -42,6 +42,11 @@ spec:
                 secretKeyRef:
                   name: pi-agent-model-credentials
                   key: OPENAI_API_KEY
+            - name: COMPOSIO_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pi-agent-composio-credentials
+                  key: COMPOSIO_API_KEY
           envFrom:
             - secretRef:
                 name: pi-agent-credentials
@@ -73,6 +78,10 @@ spec:
               mountPath: /home/node/.pi/agent/models.json
               subPath: models.json
               readOnly: true
+            - name: pi-agent-mcp-config
+              mountPath: /home/node/.pi/agent/mcp.json
+              subPath: mcp.json
+              readOnly: true
             - name: pi-agent-workspace
               mountPath: /workspace
       volumes:
@@ -82,6 +91,9 @@ spec:
         - name: pi-agent-model-config
           configMap:
             name: pi-agent-model-config
+        - name: pi-agent-mcp-config
+          configMap:
+            name: pi-agent-mcp-config
         - name: pi-agent-workspace
           persistentVolumeClaim:
             claimName: pi-agent-workspace
