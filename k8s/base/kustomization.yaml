@@ -4,9 +4,11 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - persistent-volume-claims.yaml
+  - model-config.yaml
   - oauth2-proxy-config.yaml
   - oauth2-proxy-allowlist.yaml
   - oauth2-proxy-sealed-secret.yaml
+  - model-sealed-secret.yaml
   - deployment.yaml
   - service.yaml
   - oauth2-proxy-deployment.yaml

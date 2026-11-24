@@ -83,11 +83,13 @@ the Ingress will not forward traffic to the app until it is unsealed.
 
 ## Configure credentials
 
-Provide provider credentials as a Kubernetes Secret named
-`pi-agent-credentials` in the `pi-agent` namespace. All keys in this Secret are
-exposed as environment variables to the container; for example, use the key
-expected by your configured model provider. The Secret reference is optional,
-so the web service can start before credentials are configured.
+`base/model-config.yaml` mounts the OpenAI-compatible provider configuration
+at `/home/node/.pi/agent/models.json`. Its API key is interpolated from the
+`OPENAI_API_KEY` environment variable, which comes from the
+`pi-agent-model-credentials` SealedSecret. Keep the plaintext key out of Git;
+update the SealedSecret when rotating it. Restart the `pi-agent` Deployment
+after changing `models.json` or rotating the key so the mounted config and
+environment variable are reloaded.
 
 Pi configuration can be stored in the persistent `/home/node/.pi` volume.
 Configure model providers there, or use provider environment variables from

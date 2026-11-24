@@ -35,6 +35,11 @@ spec:
               value: 0.0.0.0
             - name: PI_WEB_PORT
               value: "8504"
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pi-agent-model-credentials
+                  key: OPENAI_API_KEY
           envFrom:
             - secretRef:
                 name: pi-agent-credentials
@@ -62,12 +67,19 @@ spec:
           volumeMounts:
             - name: pi-agent-data
               mountPath: /home/node/.pi
+            - name: pi-agent-model-config
+              mountPath: /home/node/.pi/agent/models.json
+              subPath: models.json
+              readOnly: true
             - name: pi-agent-workspace
               mountPath: /workspace
       volumes:
         - name: pi-agent-data
           persistentVolumeClaim:
             claimName: pi-agent-data
+        - name: pi-agent-model-config
+          configMap:
+            name: pi-agent-model-config
         - name: pi-agent-workspace
           persistentVolumeClaim:
             claimName: pi-agent-workspace
