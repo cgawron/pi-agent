@@ -21,4 +21,4 @@ resources:
 
 images:
   - name: ghcr.io/OWNER/pi-agent
-    newTag: sha-a0422069b14782315ff1c65088e1717d364eafab
+    newTag: sha-0d9add474862383725e1bff20767eb18f0955365
