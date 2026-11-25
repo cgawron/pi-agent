@@ -112,7 +112,8 @@ individual apps the first time their tools are used.
 `base/pi-agent/settings.json` adds `~/vault/skills` to Pi's skill search paths.
 The deployment mounts the Obsidian vault at `/home/node/vault`, so Pi discovers
 skills stored under the vault's `skills` directory. Each skill should follow
-Pi's `SKILL.md` format.
+Pi's `SKILL.md` format. Restart the `pi-agent` Deployment after changing this
+file because Kubernetes mounts it using `subPath`.
 
 Pi configuration can be stored in the persistent `/home/node/.pi` volume.
 Configure model providers there, or use provider environment variables from
