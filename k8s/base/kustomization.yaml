@@ -9,4 +9,4 @@ resources:
 
 images:
   - name: ghcr.io/cgawron/pi-agent
-    newTag: sha-c4c8fc5f7a9c76fc5a075ebee85fc9b8b0012283
+    newTag: v1.1.0
