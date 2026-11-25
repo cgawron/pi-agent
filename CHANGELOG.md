@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/cgawron/pi-agent/compare/v1.1.0...v1.2.0) (2026-11-25)
+
+
+### Features
+
+* implement plugin management and settings merging for pi-agent ([d364632](https://github.com/cgawron/pi-agent/commit/d3646328b08517320c359efb28fdea623ab1c8b9))
+
 ## [1.1.0](https://github.com/cgawron/pi-agent/compare/v1.0.0...v1.1.0) (2026-11-25)
 
 
