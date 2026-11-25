@@ -23,9 +23,10 @@ USER node
 WORKDIR /workspace
 
 # Konfigurations- und Arbeitsverzeichnisse mit korrekten Rechten vorbereiten
-RUN mkdir -p /home/node/.pi/agent /home/node/.pi-web \
+RUN mkdir -p /home/node/.pi/agent /home/node/.pi-web/plugins \
     && pi install "$(npm root -g)/@jmfederico/pi-web/dist/pi-packages/scheduled-tasks" \
-    && pi install "$(npm root -g)/@mutualendemic/pi-web-codemirror-editor"
+    && ln -s "$(npm root -g)/@mutualendemic/pi-web-codemirror-editor" \
+        /home/node/.pi-web/plugins/codemirror-editor
 
 # Enable the browser-only file editor by default. Users can override this in
 # the writable PI WEB configuration through Settings → PI WEB plugins.

@@ -6,11 +6,11 @@ This image installs the Pi coding agent CLI and `pi-web`. Its default command st
 docker run --rm -p 8504:8504 your-registry/pi-agent:tag
 ```
 
-The image includes the `@mutualendemic/pi-web-codemirror-editor` package and
-enables its **CodeMirror Editor** plugin by default. In the Files panel, choose
-**Edit** for a supported text file. You can disable or re-enable the plugin in
-**Settings → PI WEB plugins**; browser-only plugin changes take effect after a
-page reload.
+The image includes the `@mutualendemic/pi-web-codemirror-editor` package in
+PI WEB's plugin directory and enables **CodeMirror Editor** by default. In the
+Files panel, choose **Edit** for a supported text file. You can disable or
+re-enable the plugin in **Settings → PI WEB plugins**; browser-only plugin
+changes take effect after a page reload.
 
 GitHub Actions uses release-please to create versioned GHCR images and update
 the Argo CD deployment tag. See [the deployment guide](k8s/README.md) for setup

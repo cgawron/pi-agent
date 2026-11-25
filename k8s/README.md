@@ -134,8 +134,8 @@ deployment stores PI WEB's writable global configuration at
 `/home/node/.pi/pi-web-config.json` so plugin settings survive pod replacement.
 
 The image also includes `@mutualendemic/pi-web-codemirror-editor`. The bootstrap
-init container registers it in the persistent Pi profile, and the image's
-PI WEB defaults enable **CodeMirror Editor**. In the Files panel, choose
+init container links it into the persistent PI WEB plugin directory, and the
+image's PI WEB defaults enable **CodeMirror Editor**. In the Files panel, choose
 **Edit** for a supported text file. You can change the plugin setting in
 **Settings → PI WEB plugins**; reload the browser after changing it.
 
