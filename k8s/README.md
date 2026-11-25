@@ -115,6 +115,10 @@ skills stored under the vault's `skills` directory. Each skill should follow
 Pi's `SKILL.md` format. Restart the `pi-agent` Deployment after changing this
 file because Kubernetes mounts it using `subPath`.
 
+The init container merges the configured skill paths into the writable
+`/home/node/.pi/agent/settings.json` on the persistent profile before managing
+Pi packages, which may update that file as packages are installed or removed.
+
 Pi configuration can be stored in the persistent `/home/node/.pi` volume.
 Configure model providers there, or use provider environment variables from
 the Secret. Do not store credentials in Git or in the container image.
@@ -131,19 +135,22 @@ that file exists. Traefik redirects visits to the bare site root to the
 `/workspace` project and workspace, so a fresh browser opens there. Other PI WEB
 URLs and navigation remain available.
 
-The image installs PI WEB's bundled **Scheduled agent tasks (beta)** Pi package
-from `@jmfederico/pi-web/dist/pi-packages/scheduled-tasks`. Because the
-`pi-agent-data` PVC covers `/home/node/.pi`, the bootstrap init container also
-registers that image-bundled package in the persistent Pi profile on startup.
-Enable its `scheduled-tasks` plugin in **Settings → PI WEB plugins**. The
-deployment stores PI WEB's writable global configuration at
-`/home/node/.pi/pi-web-config.json` so plugin settings survive pod replacement.
+The root `plugins.json` file is the source of truth for Pi packages and PI WEB
+plugins. The Docker build installs its npm dependencies and declared runtime
+requirements. Since the `pi-agent-data` PVC covers `/home/node/.pi`, the
+bootstrap init container runs the image's plugin manager to register configured
+Pi packages in the persistent profile and link PI WEB plugins into
+`PI_WEB_DATA_DIR`. The deployment stores PI WEB's writable global configuration
+at `/home/node/.pi/pi-web-config.json` so plugin settings survive pod
+replacement.
 
-The image also includes `@mutualendemic/pi-web-codemirror-editor`. The bootstrap
-init container links it into the persistent PI WEB plugin directory, and the
-image's PI WEB defaults enable **CodeMirror Editor**. In the Files panel, choose
-**Edit** for a supported text file. You can change the plugin setting in
-**Settings → PI WEB plugins**; reload the browser after changing it.
+The list includes the PI WEB **CodeMirror Editor** plugin, enabled by default,
+and the `@sttronn/pi-sheets` Pi package. The latter sets up its Python virtual
+environment during the image build; Python remains installed in the image for
+its spreadsheet tools. Update `plugins.json` and rebuild the image to change the
+installed plugin set. In the Files panel, choose **Edit** for a supported text
+file. You can change the editor setting in **Settings → PI WEB plugins**; reload
+the browser after changing it.
 
 The Obsidian vault is shared from the existing NFS export at
 `172.17.38.30:/mnt/volume1/syncthing/FH-SWF/CGawron` and appears at

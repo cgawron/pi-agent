@@ -37,21 +37,10 @@ spec:
             - |
               set -eu
               # The /home/node/.pi PVC covers the profile created in the image.
-              # Register the image-bundled agent package in the persistent profile.
-              pi install "$(npm root -g)/@jmfederico/pi-web/dist/pi-packages/scheduled-tasks"
-              editor_package="$(npm root -g)/@mutualendemic/pi-web-codemirror-editor"
-              # Remove the previous incorrect Pi extension registrations.
-              pi remove "$editor_package" >/dev/null 2>&1 || true
-              pi remove "npm:@mutualendemic/pi-web-codemirror-editor" >/dev/null 2>&1 || true
-              # Browser plugins belong in PI WEB's data directory, not Pi's profile.
-              editor_plugin_dir="${PI_WEB_DATA_DIR}/plugins"
-              editor_plugin_path="$editor_plugin_dir/codemirror-editor"
-              mkdir -p "$editor_plugin_dir"
-              if [ -L "$editor_plugin_path" ]; then
-                ln -sfn "$editor_package" "$editor_plugin_path"
-              elif [ ! -e "$editor_plugin_path" ]; then
-                ln -s "$editor_package" "$editor_plugin_path"
-              fi
+              # Merge defaults into its writable settings before package installs.
+              merge-pi-settings /etc/pi-agent/settings.json /home/node/.pi/agent/settings.json
+              # Install configured Pi packages there and register PI WEB plugins.
+              pi-agent-plugins bootstrap
               mkdir -p /home/node/.pi/web-data
               if [ ! -e /home/node/.pi/web-data/projects.json ]; then
                 cp /etc/pi-web-bootstrap/projects.json /home/node/.pi/web-data/projects.json.tmp
@@ -66,6 +55,10 @@ spec:
               mountPath: /home/node/.pi
             - name: pi-web-bootstrap
               mountPath: /etc/pi-web-bootstrap
+              readOnly: true
+            - name: pi-agent-settings-config
+              mountPath: /etc/pi-agent/settings.json
+              subPath: settings.json
               readOnly: true
             - name: pi-agent-workspace
               mountPath: /workspace
@@ -134,10 +127,6 @@ spec:
             - name: pi-agent-mcp-config
               mountPath: /home/node/.pi/agent/mcp.json
               subPath: mcp.json
-              readOnly: true
-            - name: pi-agent-settings-config
-              mountPath: /home/node/.pi/agent/settings.json
-              subPath: settings.json
               readOnly: true
             - name: pi-agent-workspace
               mountPath: /workspace

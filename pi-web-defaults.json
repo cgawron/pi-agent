@@ -1,7 +1,0 @@
-{
-  "plugins": {
-    "codemirror-editor": {
-      "enabled": true
-    }
-  }
-}

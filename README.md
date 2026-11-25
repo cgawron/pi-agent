@@ -6,11 +6,12 @@ This image installs the Pi coding agent CLI and `pi-web`. Its default command st
 docker run --rm -p 8504:8504 your-registry/pi-agent:tag
 ```
 
-The image includes the `@mutualendemic/pi-web-codemirror-editor` package in
-PI WEB's plugin directory and enables **CodeMirror Editor** by default. In the
-Files panel, choose **Edit** for a supported text file. You can disable or
-re-enable the plugin in **Settings → PI WEB plugins**; browser-only plugin
-changes take effect after a page reload.
+The image installs Pi packages and PI WEB plugins from [`plugins.json`](plugins.json).
+That list currently includes the **CodeMirror Editor** PI WEB plugin and
+`@sttronn/pi-sheets`, which contributes its XLSX skill to Pi. The editor is
+enabled by default; in the Files panel,
+choose **Edit** for a supported text file. You can change it in **Settings →
+PI WEB plugins**; browser-only plugin changes take effect after a page reload.
 
 GitHub Actions uses release-please to create versioned GHCR images and update
 the Argo CD deployment tag. See [the deployment guide](k8s/README.md) for setup
@@ -19,6 +20,23 @@ and release details.
 The image runs as the non-root `node` user and uses `/workspace` as its working directory.
 
 The container starts PI WEB's web server and session daemon directly. The `pi-web start` lifecycle command uses the host's user service manager, so it is not used in the container.
+
+## Managing plugins
+
+`plugins.json` is the source of truth for Pi packages and PI WEB plugins. The
+Docker build installs the listed packages, sets up their declared runtime
+requirements, and generates PI WEB's default plugin configuration. The
+Kubernetes bootstrap reads the same manifest to install Pi packages into the
+persistent profile and link PI WEB plugins into its data directory. The
+configured skill paths are merged into the writable persistent Pi settings.
+
+To add or remove a plugin, update `plugins.json` and rebuild the image; the
+Dockerfile and Kubernetes Deployment do not need plugin-specific edits. Pi
+packages can use an npm source or a package bundled with PI WEB. PI WEB plugins
+are installed from npm and can declare whether they are enabled by default.
+`systemPackages` and a package's optional `setup` entry describe any extra
+runtime packages and one-time setup. For example, `@sttronn/pi-sheets` declares
+Python and runs its documented `doctor --install` setup during the image build.
 
 ## Providing Pi configuration
 

@@ -1,36 +1,40 @@
 FROM node:26-bookworm-slim
 
+# Plugin metadata is the source of truth for Pi packages and PI WEB plugins.
+COPY plugins.json /etc/pi-agent/plugins.json
+COPY --chmod=755 scripts/manage-plugins.js /usr/local/bin/pi-agent-plugins
+COPY --chmod=755 scripts/merge-settings.js /usr/local/bin/merge-pi-settings
+
 # Systemabhängigkeiten installieren:
 # - git, curl, ca-certificates: Standard-Tools für Pi und MCP
-# - python3, make, g++: Werden zum Kompilieren von node-pty (für pi-web) benötigt
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
-    curl \
-    ca-certificates \
-    python3 \
-    make \
-    g++ \
+# - make, g++: Werden zum Kompilieren von node-pty (für pi-web) benötigt
+# - system packages: werden aus plugins.json gelesen
+RUN plugin_system_packages="$(/usr/local/bin/pi-agent-plugins system-packages)" \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    git curl ca-certificates make g++ $plugin_system_packages \
     && rm -rf /var/lib/apt/lists/*
 
-# Pi CLI und die Weboberfläche @jmfederico/pi-web global installieren
-RUN npm install -g @earendil-works/pi-coding-agent @jmfederico/pi-web @mutualendemic/pi-web-codemirror-editor --allow-scripts=node-pty
+# Pi CLI und die Weboberfläche @jmfederico/pi-web global installieren.
+RUN npm install -g @earendil-works/pi-coding-agent @jmfederico/pi-web --allow-scripts=node-pty
 
-# Build-Tools nach der Installation wieder entfernen, um das Image schlank zu halten
-RUN apt-get purge -y --auto-remove python3 make g++
+# Install globally-scoped PI WEB plugins while the image build still runs as root.
+RUN /usr/local/bin/pi-agent-plugins install-web-dependencies
 
 # Aus Sicherheitsgründen auf den nicht-privilegierten User "node" wechseln
 USER node
 WORKDIR /workspace
 
-# Konfigurations- und Arbeitsverzeichnisse mit korrekten Rechten vorbereiten
+# Install configured Pi packages, configure PI WEB plugins, and generate its
+# defaults from the same plugin manifest used by the Kubernetes bootstrap.
 RUN mkdir -p /home/node/.pi/agent /home/node/.pi-web/plugins \
-    && pi install "$(npm root -g)/@jmfederico/pi-web/dist/pi-packages/scheduled-tasks" \
-    && ln -s "$(npm root -g)/@mutualendemic/pi-web-codemirror-editor" \
-        /home/node/.pi-web/plugins/codemirror-editor
+    && pi-agent-plugins install
 
-# Enable the browser-only file editor by default. Users can override this in
-# the writable PI WEB configuration through Settings → PI WEB plugins.
-COPY pi-web-defaults.json /home/node/.pi-web/defaults.json
+# Build tools are needed for native npm/Python packages during installation;
+# keep Python itself for configured plugins at runtime.
+USER root
+RUN apt-get purge -y --auto-remove make g++ \
+    && rm -rf /var/lib/apt/lists/*
+USER node
 
 # Standard-Port von pi-web
 EXPOSE 8504

@@ -1,0 +1,45 @@
+{
+  "systemPackages": [
+    "python3",
+    "python3-venv"
+  ],
+  "piPackages": [
+    {
+      "source": "bundled",
+      "path": "@jmfederico/pi-web/dist/pi-packages/scheduled-tasks"
+    },
+    {
+      "source": "npm",
+      "package": "@sttronn/pi-sheets@0.1.2",
+      "setup": {
+        "command": "python3",
+        "find": {
+          "name": "xlsx.py",
+          "pathIncludes": "pi-sheets"
+        },
+        "args": [
+          "${script}",
+          "doctor",
+          "--install"
+        ]
+      }
+    }
+  ],
+  "piWebPlugins": [
+    {
+      "id": "codemirror-editor",
+      "package": "@mutualendemic/pi-web-codemirror-editor",
+      "enabled": true
+    }
+  ],
+  "removePiPackages": [
+    {
+      "source": "global",
+      "path": "@mutualendemic/pi-web-codemirror-editor"
+    },
+    {
+      "source": "npm",
+      "package": "@mutualendemic/pi-web-codemirror-editor"
+    }
+  ]
+}
