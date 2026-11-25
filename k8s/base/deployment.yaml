@@ -33,6 +33,7 @@ spec:
               # The /home/node/.pi PVC covers the profile created in the image.
               # Register the image-bundled package in the persistent profile.
               pi install "$(npm root -g)/@jmfederico/pi-web/dist/pi-packages/scheduled-tasks"
+              pi install "$(npm root -g)/@mutualendemic/pi-web-codemirror-editor"
               mkdir -p /home/node/.pi/web-data
               if [ ! -e /home/node/.pi/web-data/projects.json ]; then
                 cp /etc/pi-web-bootstrap/projects.json /home/node/.pi/web-data/projects.json.tmp
