@@ -109,6 +109,11 @@ environment variable are reloaded.
 `COMPOSIO_API_KEY` as `x-consumer-api-key`. Composio may ask you to authorize
 individual apps the first time their tools are used.
 
+`base/pi-agent/settings.json` adds `~/vault/skills` to Pi's skill search paths.
+The deployment mounts the Obsidian vault at `/home/node/vault`, so Pi discovers
+skills stored under the vault's `skills` directory. Each skill should follow
+Pi's `SKILL.md` format.
+
 Pi configuration can be stored in the persistent `/home/node/.pi` volume.
 Configure model providers there, or use provider environment variables from
 the Secret. Do not store credentials in Git or in the container image.

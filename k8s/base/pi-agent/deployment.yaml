@@ -135,10 +135,17 @@ spec:
               mountPath: /home/node/.pi/agent/mcp.json
               subPath: mcp.json
               readOnly: true
+            - name: pi-agent-settings-config
+              mountPath: /home/node/.pi/agent/settings.json
+              subPath: settings.json
+              readOnly: true
             - name: pi-agent-workspace
               mountPath: /workspace
             - name: pi-agent-obsidian-vault
               mountPath: /workspace/vault
+              readOnly: true
+            - name: pi-agent-obsidian-vault
+              mountPath: /home/node/vault
               readOnly: true
             - name: pi-agent-obsidian-vault
               mountPath: /workspace/vault/agent
@@ -157,6 +164,9 @@ spec:
         - name: pi-agent-mcp-config
           configMap:
             name: pi-agent-mcp-config
+        - name: pi-agent-settings-config
+          configMap:
+            name: pi-agent-settings-config
         - name: pi-agent-workspace
           persistentVolumeClaim:
             claimName: pi-agent-workspace

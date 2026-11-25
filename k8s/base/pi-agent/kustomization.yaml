@@ -10,3 +10,8 @@ resources:
   - model-config.yaml
   - model-sealed-secret.yaml
   - service.yaml
+
+configMapGenerator:
+  - name: pi-agent-settings-config
+    files:
+      - settings.json

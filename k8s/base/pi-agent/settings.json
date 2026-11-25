@@ -1,0 +1,6 @@
+{
+  "skills": [
+    "~/vault/skills",
+    "~/vault/agent/skills"
+  ]
+}
