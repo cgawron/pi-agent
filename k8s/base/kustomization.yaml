@@ -20,5 +20,5 @@ resources:
   - ingress.yaml
 
 images:
-  - name: ghcr.io/OWNER/pi-agent
+  - name: ghcr.io/cgawron/pi-agent
     newTag: sha-fd6ed99a935d535128a6f1f49b7c1dc24abe8c7d

@@ -6,15 +6,17 @@ it on `agent.gawron.cloud` through Traefik, and persist Pi's agent data and
 only used internally by the auth proxy.
 The PVCs use the cluster's default StorageClass and request 5 GiB and 20 GiB.
 Change these values in `base/persistent-volume-claims.yaml` to match your cluster.
+Rollouts use `RollingUpdate` with no surge and allow one unavailable replica, so
+the old pod releases the `ReadWriteOnce` volumes before the replacement starts.
 
 ## Configure the repository and image
 
-Replace `OWNER` with the GitHub account or organization that owns this
-repository in these files:
-
-- `base/kustomization.yaml` (`ghcr.io/OWNER/pi-agent`)
-- `base/deployment.yaml` (`ghcr.io/OWNER/pi-agent:main`)
-- `argocd/application.yaml` (`https://github.com/OWNER/pi-agent.git`)
+The image reference in `base/kustomization.yaml` must match the repository used
+by both containers in `base/deployment.yaml` (`ghcr.io/cgawron/pi-agent`). If
+you use a different GitHub owner or repository name, update all three image
+references together. The workflow updates the Kustomize image tag to each
+published immutable SHA tag, so both the bootstrap init container and web
+container run the same image.
 
 The workflow publishes `ghcr.io/<owner>/pi-agent` with branch, release, and
 commit-SHA tags. It uses release-please with Conventional Commits: `feat:`
