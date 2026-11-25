@@ -3,21 +3,9 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  - persistent-volume-claims.yaml
-  - obsidian-vault-storage.yaml
-  - initial-workspace.yaml
-  - model-config.yaml
-  - mcp-config.yaml
-  - oauth2-proxy-config.yaml
-  - oauth2-proxy-allowlist.yaml
-  - oauth2-proxy-sealed-secret.yaml
-  - model-sealed-secret.yaml
-  - composio-sealed-secret.yaml
-  - deployment.yaml
-  - service.yaml
-  - oauth2-proxy-deployment.yaml
-  - oauth2-proxy-service.yaml
-  - ingress.yaml
+  - pi-agent
+  - oauth2-proxy
+  - storage
 
 images:
   - name: ghcr.io/cgawron/pi-agent

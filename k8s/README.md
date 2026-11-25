@@ -5,16 +5,22 @@ it on `agent.gawron.cloud` through Traefik, and persist Pi's agent data and
 `/workspace` on separate PVCs. The app's ClusterIP service on port `8504` is
 only used internally by the auth proxy.
 The PVCs use the cluster's default StorageClass and request 5 GiB and 20 GiB.
-Change these values in `base/persistent-volume-claims.yaml` to match your cluster.
+Change these values in `base/storage/persistent-volume-claims.yaml` to match
+your cluster.
 Rollouts use `RollingUpdate` with no surge and allow one unavailable replica, so
 the old pod releases the `ReadWriteOnce` volumes before the replacement starts.
+
+Resources are grouped under `base/pi-agent`, `base/oauth2-proxy`, and
+`base/storage`. Each directory has its own Kustomization, and
+`base/kustomization.yaml` composes them with the namespace and shared image tag.
 
 ## Configure the repository and image
 
 The image reference in `base/kustomization.yaml` must match the repository used
-by both containers in `base/deployment.yaml` (`ghcr.io/cgawron/pi-agent`). If
-you use a different GitHub owner or repository name, update all three image
-references together. The workflow updates the Kustomize image tag to each
+by both containers in `base/pi-agent/deployment.yaml`
+(`ghcr.io/cgawron/pi-agent`). If you use a different GitHub owner or repository
+name, update the image repository in the root Kustomization and both Deployment
+container specs together. The workflow updates the Kustomize image tag to each
 published immutable SHA tag, so both the bootstrap init container and web
 container run the same image.
 
@@ -39,8 +45,8 @@ for a private package.
 
 ## Install the Argo CD application
 
-After setting the repository owner above, apply the Application to the cluster
-where Argo CD is installed:
+After configuring the image repository above, apply the Application to the
+cluster where Argo CD is installed:
 
 ```sh
 kubectl apply -f k8s/argocd/application.yaml
@@ -49,7 +55,7 @@ kubectl apply -f k8s/argocd/application.yaml
 The Application targets the `main` branch and enables automated sync, pruning,
 and self-healing. Point `agent.gawron.cloud` DNS at the Traefik ingress address.
 The Ingress uses the Traefik `letsencrypt` certificate resolver configured in
-`base/ingress.yaml`.
+`base/pi-agent/ingress.yaml`.
 
 The Deployment enforces PI WEB's hostname policy as restricted to
 `agent.gawron.cloud` through `PI_WEB_HOST_ACCESS`. The oauth2-proxy forwards the
@@ -63,9 +69,8 @@ access remain available for local administration.
 uses Keycloak at `https://keycloak.gawron.cloud/realms/private`. Register
 `https://agent.gawron.cloud/oauth2/callback` as an allowed redirect URI for the
 OIDC client. Access is restricted to exact email addresses listed in
-`base/oauth2-proxy-allowlist.yaml`, one address per line. The list is empty by
-default, so no user is allowed until you add an address. Keycloak must return
-the user's email claim. For example:
+`base/oauth2-proxy/oauth2-proxy-allowlist.yaml`, one address per line. Keycloak
+must return the user's email claim. For example:
 
 ```yaml
 data:
@@ -81,8 +86,8 @@ the proxy reloads it:
 kubectl rollout restart deployment/pi-agent-oauth2-proxy -n pi-agent
 ```
 
-`base/oauth2-proxy-sealed-secret.yaml` creates the Kubernetes Secret
-`pi-agent-oauth2-proxy-credentials`. It contains the existing Keycloak
+`base/oauth2-proxy/oauth2-proxy-sealed-secret.yaml` creates the Kubernetes
+Secret `pi-agent-oauth2-proxy-credentials`. It contains the existing Keycloak
 `pi-agent` client's ID and secret plus a generated cookie secret. The cookie
 secret must be 16, 24, or 32 characters; generate a 32-character value with
 `openssl rand -base64 24`. The SealedSecret is encrypted for this cluster's
@@ -91,15 +96,15 @@ the Ingress will not forward traffic to the app until it is unsealed.
 
 ## Configure credentials
 
-`base/model-config.yaml` mounts the OpenAI-compatible provider configuration
-at `/home/node/.pi/agent/models.json`. Its API key is interpolated from the
-`OPENAI_API_KEY` environment variable, which comes from the
+`base/pi-agent/model-config.yaml` mounts the OpenAI-compatible provider
+configuration at `/home/node/.pi/agent/models.json`. Its API key is interpolated
+from the `OPENAI_API_KEY` environment variable, which comes from the
 `pi-agent-model-credentials` SealedSecret. Keep the plaintext key out of Git;
 update the SealedSecret when rotating it. Restart the `pi-agent` Deployment
 after changing `models.json` or rotating the key so the mounted config and
 environment variable are reloaded.
 
-`base/mcp-config.yaml` configures Composio Connect at
+`base/pi-agent/mcp-config.yaml` configures Composio Connect at
 `https://connect.composio.dev/mcp`. Pi sends the SealedSecret-backed
 `COMPOSIO_API_KEY` as `x-consumer-api-key`. Composio may ask you to authorize
 individual apps the first time their tools are used.
@@ -114,10 +119,11 @@ should access, and ensure the storage driver allows the container's UID/GID
 
 PI WEB's project registry and server-side data are stored in the `pi-agent-data`
 PVC at `/home/node/.pi/web-data`. On first startup, an init container seeds the
-registry with the `/workspace` project from `base/initial-workspace.yaml`; it
-does not replace the registry after that file exists. Traefik redirects visits
-to the bare site root to the `/workspace` project and workspace, so a fresh
-browser opens there. Other PI WEB URLs and navigation remain available.
+registry with the `/workspace` project from
+`base/pi-agent/initial-workspace.yaml`; it does not replace the registry after
+that file exists. Traefik redirects visits to the bare site root to the
+`/workspace` project and workspace, so a fresh browser opens there. Other PI WEB
+URLs and navigation remain available.
 
 The image installs PI WEB's bundled **Scheduled agent tasks (beta)** Pi package
 from `@jmfederico/pi-web/dist/pi-packages/scheduled-tasks`. Because the
